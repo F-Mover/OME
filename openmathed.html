@@ -1,0 +1,156 @@
+<!--
+   openmathed.html
+  
+   Copyright 2021 - 2022 Alexey Filonov <alexey@philon.ru>
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+   
+-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Open MathEd</title>
+		<style>
+		#results{
+			position: fixed;
+		    display: block;
+		    float: right;
+		    top: 100px;
+		    right: 100px;
+		}
+		</style>
+	</head>
+	<body>
+		<script>
+			var success=0;
+			var from=false;
+			var to=false;
+			var action=false;
+			const act = new Map( [['minus','"-"'],
+				['plus','"+"'],
+				['multi','"x"'],
+				['divide','"/"']
+			]);
+			function getRandomInt(min, max)	{
+			  return Math.floor(Math.random() * (max - min + 1)) + min;
+			}
+			function check(elem, ans){
+				//el=document.getElementById(elem);
+				if(elem.value!=""){
+					elem.value=Number(elem.value);
+					elem.disabled=true;
+					if(elem.value==ans){
+						if(elem.style.backgroundColor != 'lightgreen'){
+							elem.style.backgroundColor = 'lightgreen';
+							document.getElementById('success').innerText=Number(document.getElementById('success').innerText)+1;
+						}
+					} else {
+						elem.style.backgroundColor = 'lightpink';
+						elem.focus();
+					}
+				}
+			}
+			function question(){
+				var results=document.getElementById("results");
+				var content=document.getElementById("question");
+				var i;
+				var r;
+				var a;
+				var b;
+				var actext;
+				var id;
+				if(document.getElementById('success'))document.getElementById('success').id='done';
+				action=document.getElementById("action").selectedOptions;
+				from=Number(document.getElementById("from").value);
+				to=Number(document.getElementById("to").value);
+				id='';
+				for(i=0;i<4;i++){
+					id=id+getRandomInt(0, 9).toString();
+				}
+				if(results.innerHTML=='')results.innerHTML='<h1>Результаты</h1><h3>Задание '+id+'</h3>';
+				actext='';
+				for(i=0;i<action.length;i++){
+					actext=actext+act.get(action[i].value)+' ';
+				}
+				results.innerHTML+='от '+from+' до '+to+' '+actext+' - <span style="color: green" id="success"></span><br>';
+				document.getElementById('success').innerText=0;
+				content.innerHTML='<h1>Выполни задания:</h1>';
+				for(i=0;i<10;i++){
+					r=getRandomInt(0, action.length-1);
+					switch(action[r].value){
+						case 'minus':
+							a=getRandomInt(from, to);
+							b=getRandomInt(from, a);
+							c=a-b;
+							content.innerHTML+='<h1>'+a+'-'+b+'=<input class="prim" size="5" style="font-size:'+
+								' xx-large;" type="number" autocomplete="off" '+
+								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
+							break;
+						case 'plus':
+							a=getRandomInt(from, to);
+							b=getRandomInt(from, to);
+							c=a+b;
+							content.innerHTML+='<h1>'+a+'+'+b+'=<input class="prim" size="5" style="font-size:'+
+								' xx-large;" type="number" autocomplete="off" '+
+								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
+							break;
+						case 'multi':
+							a=getRandomInt(from, to);
+							b=getRandomInt(from, to);
+							c=a*b;
+							content.innerHTML+='<h1>'+a+'x'+b+'=<input class="prim" size="5" style="font-size:'+
+								' xx-large;" type="number" autocomplete="off" '+
+								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
+							break;
+						case 'divide':
+							do{
+								a=getRandomInt(from, to);
+								b=getRandomInt(from, to);
+								if(b==0)b=b+1;
+								c=a*b;
+							}while(c>to);
+							content.innerHTML+='<h1>'+c+':'+b+'=<input class="prim" size="5" style="font-size:'+
+								' xx-large;" type="number" autocomplete="off" '+
+								'onclick="this.focus()" onblur="check(this, '+a+')"></h1>';
+							break;
+					}
+				}
+				window.onblur = function() {
+					var elements = document.getElementsByClassName('prim');
+					for(i=0; i<elements.length; i++){
+						if(elements[i].style.backgroundColor != 'lightgreen'){
+							elements[i].disabled=true;
+							elements[i].style.backgroundColor = 'lightpink';
+						}
+					}
+					alert( 'Нельзя уходить со страницы!' );
+					
+				}
+			}
+		</script>
+		<h1>от <input size="5" style="font-size: xx-large;" type="number" id="from">
+		до <input size="5" style="font-size: xx-large;" type="number" id="to">
+		<select id="action" multiple style="font-size: xx-large;">
+			<option value="minus">Вычитание</option>
+			<option value="plus">Сложение</option>
+			<option value="multi">Умножение</option>
+			<option value="divide">Деление</option>
+		</select>
+		<button onclick="question()" style="font-size: xx-large;">Решать!</button></h1>
+		<div id="question"></div>
+		<div id="results" style="overflow: scroll"></div>
+	</body>
+</html>
