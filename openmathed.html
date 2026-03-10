@@ -1,7 +1,7 @@
 <!--
    openmathed.html
   
-   Copyright 2021 - 2022, 2024 Alexey Filonov <alexey@philon.ru>
+   Copyright 2021 - 2022, 2024, 2026 Alexey Filonov <alexey@philon.ru>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,13 @@
 		    top: 100px;
 		    right: 100px;
 		}
+		select{
+			display:inline-block;
+			height:48px;
+		}
+		option{
+			display:inline-block;
+		}
 		</style>
 	</head>
 	<body>
@@ -41,8 +48,8 @@
 			let action=false;
 			const act = new Map( [['minus','"-"'],
 				['plus','"+"'],
-				['multi','"x"'],
-				['divide','"/"']
+				['multi','"×"'],
+				['divide','"÷"']
 			]);
 			function getRandomInt(min, max)	{
 			  return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -100,6 +107,7 @@
 							a=getRandomInt(from, to);
 							b=getRandomInt(from, a);
 							c=a-b;
+							if(b<0)b='('+b+')';
 							content.innerHTML+='<h1>'+a+'-'+b+'=<input class="open" size="5" style="font-size:'+
 								' xx-large;" type="number" autocomplete="off" '+
 								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
@@ -108,6 +116,7 @@
 							a=getRandomInt(from, to);
 							b=getRandomInt(from, to);
 							c=a+b;
+							if(b<0)b='('+b+')';
 							content.innerHTML+='<h1>'+a+'+'+b+'=<input class="open" size="5" style="font-size:'+
 								' xx-large;" type="number" autocomplete="off" '+
 								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
@@ -116,7 +125,8 @@
 							a=getRandomInt(from, to);
 							b=getRandomInt(from, to);
 							c=a*b;
-							content.innerHTML+='<h1>'+a+'x'+b+'=<input class="open" size="5" style="font-size:'+
+							if(b<0)b='('+b+')';
+							content.innerHTML+='<h1>'+a+'×'+b+'=<input class="open" size="5" style="font-size:'+
 								' xx-large;" type="number" autocomplete="off" '+
 								'onclick="this.focus()" onblur="check(this, '+c+')"></h1>';
 							break;
@@ -127,6 +137,7 @@
 								if(b==0)b=b+1;
 								c=a*b;
 							}while(c>to);
+							if(b<0)b='('+b+')';
 							content.innerHTML+='<h1>'+c+':'+b+'=<input class="open" size="5" style="font-size:'+
 								' xx-large;" type="number" autocomplete="off" '+
 								'onclick="this.focus()" onblur="check(this, '+a+')"></h1>';
@@ -146,15 +157,27 @@
 						alert( 'Нельзя уходить со страницы!' );
 					}
 				}
+				const inputs = document.querySelectorAll('input[type="number"]');
+
+				inputs.forEach((input, index) => {
+					input.addEventListener('keydown', function(event) {
+					  if (event.key === 'Enter') {
+						event.preventDefault();
+						if (index + 1 < inputs.length) {
+						  inputs[index + 1].focus();
+						}
+					  }
+					});
+				});
 			}
 		</script>
 		<h1>от <input size="5" style="font-size: xx-large;" type="number" id="from">
 		до <input size="5" style="font-size: xx-large;" type="number" id="to">
 		<select id="action" multiple style="font-size: xx-large;">
-			<option value="minus">Вычитание</option>
-			<option value="plus">Сложение</option>
-			<option value="multi">Умножение</option>
-			<option value="divide">Деление</option>
+			<option value="minus">-</option>
+			<option value="plus">+</option>
+			<option value="multi">×</option>
+			<option value="divide">÷</option>
 		</select>
 		<button onclick="question()" style="font-size: xx-large;">Решать!</button></h1>
 		<div id="question"></div>
